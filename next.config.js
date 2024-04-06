@@ -17,6 +17,15 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  redirects: async () => {
+    return [
+      {
+        source: "/",
+        destination: "/signin",
+        permanent: true,
+      },
+    ];
+  }
 };
 
 export default config;

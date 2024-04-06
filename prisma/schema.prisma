@@ -33,10 +33,10 @@ model Categories {
 }
 
 model UserCategory {
+  id         Int      @id @default(autoincrement())
   user       User       @relation(fields: [userId], references: [id])
   userId     Int
   category   Categories @relation(fields: [categoryId], references: [id])
   categoryId Int
 
-  @@id([userId, categoryId])
 }
