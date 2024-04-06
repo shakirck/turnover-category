@@ -15,11 +15,12 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  username  String
+  email     String   @unique
+  name  String
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  isVerified Boolean @default(false)
   // @@index([name])
   UserCategory UserCategory[]
 }
@@ -33,10 +34,18 @@ model Categories {
 }
 
 model UserCategory {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   user       User       @relation(fields: [userId], references: [id])
   userId     Int
   category   Categories @relation(fields: [categoryId], references: [id])
   categoryId Int
+}
 
+model VerificationOTP {
+  id        Int      @id @default(autoincrement())
+  otp       String
+  email     String @unique
+  expiry    DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

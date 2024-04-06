@@ -6,7 +6,7 @@ import { api } from "~/utils/api";
 export default function Signin() {
   const mymutation = api.auth.signin.useMutation();
   const router = useRouter();
-  const [state, setState] = useState({ username: "", password: "" });
+  const [state, setState] = useState({ email: "", password: "" });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,

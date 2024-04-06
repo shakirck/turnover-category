@@ -7,13 +7,13 @@ export default function Signup() {
   const mymutation = api.auth.signup.useMutation();
   const router = useRouter();
 
-  const [state, setState] = useState({ username: "", password: "" });
+  const [state, setState] = useState({ email: "",  name: "" , password: "" });
   const submit = async () => {
     const res = await mymutation.mutateAsync(state);
-    const token = res.token
-    localStorage.setItem("token", token);
-    console.log(token,'token')
-    router.push("/dashboard");
+    // const token = res.token
+    // localStorage.setItem("token", token);
+    // console.log(token,'token')
+    router.push("/verify");
   };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -34,6 +34,7 @@ export default function Signup() {
             </label>
             <div className="relative rounded-lg border-2 focus-within:border-gray-400">
               <input
+              onChange={(e) => handleChange(e, "name")}
                 type="text"
                 name="name"
                 id="name"
@@ -48,6 +49,7 @@ export default function Signup() {
             </label>
             <div className="relative rounded-lg border-2 focus-within:border-gray-400">
               <input
+              onChange={(e) => handleChange(e, "email")}
                 type="text"
                 name="email"
                 id="email"
@@ -62,6 +64,7 @@ export default function Signup() {
             </label>
             <div className="relative rounded-lg border-2 focus-within:border-gray-400">
               <input
+              onChange={(e) => handleChange(e, "password")}
                 type=  "password" 
                 name="password"
                 id="password"
@@ -72,7 +75,7 @@ export default function Signup() {
             </div>
           </div>
           <div className="flex flex-col">
-            <button className="rounded-md bg-black p-3 text-white hover:bg-slate-900">
+            <button className="rounded-md bg-black p-3 text-white hover:bg-slate-900" onClick={submit}>
               Create Account
             </button>
           </div>
