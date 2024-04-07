@@ -7,21 +7,22 @@ const alg = "HS256";
 
 export const createToken = async (payload: any) => {
   const jwt = await new jose.SignJWT({
-  user_id: payload.id,
+    user_id: payload.id,
+    name: payload.name,
   })
     .setProtectedHeader({ alg })
     .setIssuedAt()
     .setExpirationTime("24h")
     .sign(secret);
 
-  console.log(jwt ,"createtoken");
+  console.log(jwt, "createtoken");
   return jwt;
 };
 export const decodeAndVerifyJwtToken = async (jwt: string) => {
   try {
-    console.log(jwt, "jwt decodeAndVerifyJwtToken")
+    console.log(jwt, "jwt decodeAndVerifyJwtToken");
     const { payload, protectedHeader } = await jose.jwtVerify(jwt, secret);
-    console.log(payload, "payload  decodeAndVerifyJwtToken")
+    console.log(payload, "payload  decodeAndVerifyJwtToken");
     return payload;
   } catch (error) {
     console.error(error);

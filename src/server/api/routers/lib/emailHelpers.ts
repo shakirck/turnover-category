@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import dayjs from "dayjs";
 import { db } from "~/server/db";
-import {createTransport}  from  "nodemailer"
+import { createTransport } from "nodemailer";
 const transporter = createTransport({
   host: process.env.EMAIL_HOST,
   port: 587,
@@ -11,7 +11,11 @@ const transporter = createTransport({
     pass: process.env.EMAIL_AUTH_PASSWORD,
   },
 });
-export const sendEmail =  async (email: string, content: string, subject: string) => {
+export const sendEmail = async (
+  email: string,
+  content: string,
+  subject: string,
+) => {
   const info = await transporter.sendMail({
     from: '"shakirck 👻" <shakirck333@gmail.com>', // sender address
     to: email, // list of receivers
@@ -19,7 +23,6 @@ export const sendEmail =  async (email: string, content: string, subject: string
     html: content, // html body
   });
   console.log("Message sent: %s", info);
-
 };
 export const sendVerificationEmail = async (email: string) => {
   console.log("  sendVerificationEmail to ", email);
@@ -49,15 +52,15 @@ export const sendVerificationEmail = async (email: string) => {
   await sendEmail(email, content, subject);
 };
 export const generateCode = (length: number) => {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const numbers = "0123456789";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const numbers = "0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
-    if(i < 4){
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    else{
+    if (i < 4) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length),
+      );
+    } else {
       result += numbers.charAt(Math.floor(Math.random() * numbers.length));
     }
   }

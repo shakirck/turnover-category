@@ -19,7 +19,7 @@ export default function Dashboard() {
   const totalPages = Math.ceil(totalItems / 6);
   const [checkedStates, setCheckedStates] = useState<any>({});
   const checkedStatus: { [key: number]: boolean } = {};
-  
+
   useEffect(() => {
     if (categories) {
       categories.forEach((categories: any) => {
@@ -50,7 +50,6 @@ export default function Dashboard() {
   };
 
   const checkboxList = categories?.map((category: any, index: number) => {
- 
     return (
       <div
         className="min-h-[500px inline-flex items-center"
@@ -136,28 +135,28 @@ export default function Dashboard() {
           <div className="text-1xl  ">We will keep you notified</div>
         </div>
         <div className="text-2xl font-medium ">My Saved interests!</div>
-        <div className="min-h-[556px] flex w-full flex-col justify-start [&>*]:py-3">
+        <div className="flex min-h-[556px] w-full flex-col justify-start [&>*]:py-3">
           {myquery.isLoading && <div>Loading...</div>}
           {checkboxList}
         </div>
 
         <div className="flex justify-center pb-5">
-          <div className="cursor-pointer w-10 p-3">
+          <div className="w-10 cursor-pointer p-3">
             <AiOutlineDoubleLeft onClick={() => goToPage(1)} />
           </div>
-          <div className="cursor-pointer w-10 p-3">
+          <div className="w-10 cursor-pointer p-3">
             <IoChevronBackOutline onClick={() => goToPage(currentPage - 1)} />
           </div>
           <div className="flex p-3">
             {pages()}
             <div>....</div>
           </div>
-          <div className="cursor-pointer w-10 p-3">
+          <div className="w-10 cursor-pointer p-3">
             <IoChevronForwardOutline
               onClick={() => goToPage(currentPage + 1)}
             />
           </div>
-          <div className="cursor-pointer w-10 p-3">
+          <div className="w-10 cursor-pointer p-3">
             <AiOutlineDoubleRight onClick={() => goToPage(totalPages)} />
           </div>
         </div>

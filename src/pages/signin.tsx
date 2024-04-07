@@ -55,7 +55,7 @@ export default function Signin() {
       const res = await mymutation.mutateAsync(state);
       const token = res.token;
       if (!token) {
-        return
+        return;
       }
       router.push("/dashboard");
     } catch (error) {

@@ -24,6 +24,7 @@ export const authRouter = createTRPCRouter({
           email: true,
           password: true,
           id: true,
+          name: true,
         },
       });
       if (!userdata) {
@@ -59,22 +60,22 @@ export const authRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { email, password, name } = input;
-      const  checkUserExists = await db.user.findFirst({
+      const checkUserExists = await db.user.findFirst({
         where: {
           email: email,
         },
       });
-      if (checkUserExists  && checkUserExists.isVerified){
+      if (checkUserExists && checkUserExists.isVerified) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "User already exists",
         });
       }
-      if(checkUserExists && !checkUserExists.isVerified){
+      if (checkUserExists && !checkUserExists.isVerified) {
         sendVerificationEmail(email);
         return {
           user: checkUserExists,
-        }
+        };
       }
       const userdata = await db.user.create({
         data: {
@@ -96,9 +97,9 @@ export const authRouter = createTRPCRouter({
         code: z.string(),
       }),
     )
-    .mutation(async ({ input ,ctx}) => {
+    .mutation(async ({ input, ctx }) => {
       const { email, code } = input;
-      console.log(email, code, "verify")
+      console.log(email, code, "verify");
       const user = await db.user.findFirst({
         where: {
           email: email,
@@ -126,8 +127,8 @@ export const authRouter = createTRPCRouter({
       }
 
       const currentTime = new Date().toISOString();
-      console.log(currentTime, verification.expiry, "time")
-      console.log(new Date(currentTime) , new Date(verification.expiry) , "time")
+      console.log(currentTime, verification.expiry, "time");
+      console.log(new Date(currentTime), new Date(verification.expiry), "time");
       if (new Date(currentTime) > new Date(verification.expiry)) {
         console.error("Code expired");
         throw new TRPCError({
@@ -142,13 +143,13 @@ export const authRouter = createTRPCRouter({
         },
       });
 
-      console.log(user, "user")
+      console.log(user, "user");
       await db.user.update({
         where: {
           id: user.id,
         },
         data: {
-          isVerified: true
+          isVerified: true,
         },
       });
       const jwt = await createToken(user);
@@ -159,27 +160,26 @@ export const authRouter = createTRPCRouter({
           maxAge: 60 * 60 * 24,
           path: "/",
           sameSite: "lax",
-        })
+        }),
       );
       return {
         user,
         token: jwt,
       };
     }),
-    signout: publicProcedure.mutation(async ({ctx}) => {
-      ctx.res.setHeader(
-        "Set-Cookie",
-        cookie.serialize("token", "", {
-          httpOnly: true,
-          maxAge: -1,
-          path: "/",
-          sameSite: "lax",
-        })
-      );
-      return true;
-    },
-  ),
-  isAuthenticated: privateProcedure.query(async ({ctx}) => {
+  signout: publicProcedure.mutation(async ({ ctx }) => {
+    ctx.res.setHeader(
+      "Set-Cookie",
+      cookie.serialize("token", "", {
+        httpOnly: true,
+        maxAge: -1,
+        path: "/",
+        sameSite: "lax",
+      }),
+    );
+    return true;
+  }),
+  me: privateProcedure.query(async ({ ctx }) => {
     return ctx.user;
   }),
 });

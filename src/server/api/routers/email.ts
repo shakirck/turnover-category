@@ -10,7 +10,7 @@ export const emailRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { email } = input;
-        await sendVerificationEmail(email);
+      await sendVerificationEmail(email);
       return true;
     }),
 });

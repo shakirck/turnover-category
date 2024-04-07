@@ -22,7 +22,7 @@ export default function Signup() {
   if (!email) {
     router.push("/signup");
   }
- 
+
   const handleInputChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.value) {
@@ -90,7 +90,6 @@ export default function Signup() {
     refs.forEach((ref: any, index: number) => {
       ref.current.value = pastedData[index];
     });
-  
   };
   function obfuscateEmail(email: string) {
     let [username, domain] = email.split("@");
@@ -146,20 +145,15 @@ export default function Signup() {
               VERIFY
             </button>
             {error && (
-              <div className="text-red-500 text-lg font-semibold">
+              <div className="text-lg font-semibold text-red-500">
                 Please enter a valid code
               </div>
-            )  
-            }
+            )}
 
-            {
-              verifyMutation.isPending && <div>Verifying...</div>
-            }
+            {verifyMutation.isPending && <div>Verifying...</div>}
           </div>
         </div>
       </div>
     </div>
-
   );
-  
 }

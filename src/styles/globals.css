@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
- min-height: 100vh; 
+body {
+  min-height: 100vh;
 }
