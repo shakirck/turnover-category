@@ -10,8 +10,9 @@ import { initTRPC } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
+import * as jose from "jose";
 import { db } from "~/server/db";
+import { decodeAndVerifyJwtToken } from "../lib/auth";
 
 /**
  * 1. CONTEXT
@@ -45,8 +46,11 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (_opts: CreateNextContextOptions) => {
-  return createInnerTRPCContext({});
+export const createTRPCContext = (opts: CreateNextContextOptions) => {
+  return {
+    req: opts.req,
+    res: opts.res,
+  };
 };
 
 /**
@@ -99,4 +103,31 @@ export const createTRPCRouter = t.router;
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
+
+export const isAuthenticated = t.middleware(async (opts) => {
+  try {
+    const cookies = opts.ctx.req.cookies;
+    if (!cookies) {
+      throw new Error("No token found");
+    }
+    const token = cookies.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+    const decoded = await decodeAndVerifyJwtToken(token);
+    if (!decoded) {
+      throw new Error("Invalid token");
+    }
+    return opts.next({
+      ctx: {
+        user: decoded,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Invalid token");
+  }
+});
+
+export const privateProcedure = t.procedure.use(isAuthenticated);
 export const publicProcedure = t.procedure;
