@@ -5,7 +5,11 @@ import * as jose from "jose";
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 const alg = "HS256";
 
-export const createToken = async (payload: any) => {
+type Payload = {
+  id: number;
+  name: string;
+};
+export const createToken = async (payload:Payload) => {
   const jwt = await new jose.SignJWT({
     user_id: payload.id,
     name: payload.name,

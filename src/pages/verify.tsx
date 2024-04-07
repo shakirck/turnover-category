@@ -1,12 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+'use client'
 import { useRouter } from "next/router";
-import Trpc from "./api/trpc/[trpc]";
 import { api } from "~/utils/api";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import {  useState } from "react";
 import React, { createRef } from "react";
-import { set } from "zod";
 
-const refs: any = Array(8)
+const refs: React.RefObject<HTMLInputElement>[] = Array(8)
   .fill(0)
   .map((_, i) => createRef());
 export default function Signup() {
@@ -19,9 +18,6 @@ export default function Signup() {
   });
   const router = useRouter();
   const email = router.query.email as string;
-  if (!email) {
-    router.push("/signup");
-  }
 
   const handleInputChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +28,7 @@ export default function Signup() {
             e.target.value,
             ...code.slice(index + 1),
           ]);
-          refs[index + 1].current.focus();
+          // refs[index + 1].current
         }
         if (index === refs.length - 1) {
           setCode([...code.slice(0, index), e.target.value]);
@@ -46,7 +42,7 @@ export default function Signup() {
     (index: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Backspace" && !e.currentTarget.value && index > 0) {
         setCode([...code.slice(0, index), ...code.slice(index + 1)]);
-        refs[index - 1].current.focus();
+        // refs[index - 1].current.focus();
       }
     };
 
@@ -62,7 +58,7 @@ export default function Signup() {
       const email = router.query.email as string;
       if (!email) {
         console.error("Please provide a valid email");
-        router.push("/signup");
+       await  router.push("/signup");
       }
       console.log(codeString);
       const verified = await verifyMutation.mutateAsync({
@@ -70,8 +66,8 @@ export default function Signup() {
         email: email,
       });
       console.log(verified);
-      if (verified && verified.token) {
-        router.push("/dashboard");
+      if (verified?.token) {
+       await  router.push("/dashboard");
       }
     } catch (error) {
       console.error(error);
@@ -86,14 +82,15 @@ export default function Signup() {
     }
     setCode(pastedData.split(""));
 
-    // add the code into the input box
-    refs.forEach((ref: any, index: number) => {
-      ref.current.value = pastedData[index];
+    refs.forEach((ref: React.RefObject<HTMLInputElement>, index: number) => {
+      if (ref.current) {
+        ref.current.value = pastedData[index]!;
+      }
     });
   };
   function obfuscateEmail(email: string) {
-    let [username, domain] = email.split("@");
-    let obfuscatedNamePart = username?.substring(0, 3) + "***";
+    const [username, domain] = email.split("@");
+    const obfuscatedNamePart = username?.substring(0, 3) + "***";
     return obfuscatedNamePart + "@" + domain;
   }
 
@@ -118,7 +115,7 @@ export default function Signup() {
 
             <div className="relative  flex flex-row flex-wrap  justify-between">
               {refs.map(
-                (ref: React.RefObject<HTMLInputElement>, index: any) => (
+                (ref: React.RefObject<HTMLInputElement>, index: number) => (
                   <input
                     key={index}
                     type="text"

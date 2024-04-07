@@ -65,14 +65,14 @@ export const authRouter = createTRPCRouter({
           email: email,
         },
       });
-      if (checkUserExists && checkUserExists.isVerified) {
+      if (checkUserExists?.isVerified) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "User already exists",
         });
       }
       if (checkUserExists && !checkUserExists.isVerified) {
-        sendVerificationEmail(email);
+        await  sendVerificationEmail(email);
         return {
           user: checkUserExists,
         };
@@ -85,7 +85,7 @@ export const authRouter = createTRPCRouter({
         },
       });
       // const jwt = await createToken(userdata);
-      sendVerificationEmail(userdata.email);
+      await  sendVerificationEmail(userdata.email);
       return {
         userdata,
       };

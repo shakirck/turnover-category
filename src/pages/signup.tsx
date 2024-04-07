@@ -1,10 +1,8 @@
 import { useRouter } from "next/router";
-import Trpc from "./api/trpc/[trpc]";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import Link from "next/link";
 import { ZodError } from "zod";
-import { z } from "zod";
 export default function Signup() {
   const [errror, setError] = useState<string | null>(null);
   const mymutation = api.auth.signup.useMutation({
@@ -24,8 +22,8 @@ export default function Signup() {
         setError("Please provide email, name and password");
         return;
       }
-      const res = await mymutation.mutateAsync(state);
-      router.push({
+    await mymutation.mutateAsync(state);
+     await  router.push({
         pathname: "/verify",
         query: { email: state.email },
       });

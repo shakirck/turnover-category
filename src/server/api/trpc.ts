@@ -110,7 +110,7 @@ export const isAuthenticated = t.middleware(async (opts) => {
     if (!cookies) {
       throw new Error("No token found");
     }
-    const token = cookies["token"];
+    const token = cookies.token;
     if (!token) {
       throw new Error("No token found");
     }
