@@ -1,10 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect,  useState } from "react";
 import { api } from "~/utils/api";
 import { AiOutlineDoubleLeft } from "react-icons/ai";
 import { AiOutlineDoubleRight } from "react-icons/ai";
 import { IoChevronBackOutline } from "react-icons/io5";
 import { IoChevronForwardOutline } from "react-icons/io5";
 
+type Category = {
+  id: number;
+  name: string;
+  UserCategory: Array<unknown>;
+};
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const myquery = api.categories.getCategories.useQuery({
@@ -14,15 +19,15 @@ export default function Dashboard() {
   const mymutate = api.categories.markCategory.useMutation();
   const data = myquery.data;
 
-  const categories: any = data?.categories;
+  const categories = data?.categories as Category[];
   const totalItems = data?.totalItems as number;
   const totalPages = Math.ceil(totalItems / 6);
-  const [checkedStates, setCheckedStates] = useState<any>({});
-  const checkedStatus: { [key: number]: boolean } = {};
+  const [checkedStates, setCheckedStates] = useState<Record<number,boolean>>({});
 
   useEffect(() => {
+  const checkedStatus: Record<number,boolean> = {};
     if (categories) {
-      categories.forEach((categories: any) => {
+      categories.forEach((categories: Category) => {
         checkedStatus[categories.id] = categories.UserCategory.length > 0;
       });
 
@@ -30,26 +35,26 @@ export default function Dashboard() {
     }
   }, [categories]);
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckboxChange =  async (event: React.ChangeEvent<HTMLInputElement>) => {
     const checkedId = event.target.value;
     const checked = event.target.checked;
 
-    setCheckedStates((prevStates: any) => ({
+    setCheckedStates((prevStates: Record<number,boolean> ) => ({
       ...prevStates,
       [checkedId]: checked,
     }));
 
-    mymutate.mutateAsync({
+    await  mymutate.mutateAsync({
       category_id: Number(checkedId),
     });
   };
 
-  const goToPage = (page: number) => {
+  const goToPage = async (page: number) => {
     setCurrentPage(page);
-    myquery.refetch();
+    await  myquery.refetch();
   };
 
-  const checkboxList = categories?.map((category: any, index: number) => {
+  const checkboxList = categories?.map((category: Category, index: number) => {
     return (
       <div
         className="min-h-[500px inline-flex items-center"
@@ -64,7 +69,7 @@ export default function Dashboard() {
             type="checkbox"
             className="before:content[''] border-blue-gray-200 before:bg-blue-gray-500 peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border transition-all before:absolute before:left-2/4 before:top-2/4 before:block before:h-12 before:w-12 before:-translate-x-2/4 before:-translate-y-2/4 before:rounded-full before:opacity-0 before:transition-opacity checked:border-gray-900 checked:bg-gray-900 checked:before:bg-gray-900 hover:before:opacity-10"
             id={category.id.toString()}
-            checked={checkedStates[category.id] || false}
+            checked={checkedStates[category.id] ?? false}
             value={category.id}
             onChange={handleCheckboxChange}
           />

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -57,7 +58,7 @@ export default function Signin() {
       if (!token) {
         return;
       }
-      router.push("/dashboard");
+      await router.push("/dashboard");
     } catch (error) {
       console.error(error, "error");
     }
@@ -148,7 +149,7 @@ export default function Signin() {
           {error && <div className="text-red-500">{error}</div>}
           <div className="w-full border-t-2"></div>
           <div className="flex w-full items-center  justify-center">
-            <span>Don't have an account</span>
+            <span>Don&apos;t have an account</span>
             <Link
               href="/signup"
               className="mx-2 items-center text-lg font-semibold "

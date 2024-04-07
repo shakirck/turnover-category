@@ -1,6 +1,6 @@
+import type { RequestCookies } from "next/dist/compiled/@edge-runtime/cookies";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { RequestCookies } from "next/dist/compiled/@edge-runtime/cookies";
 import { decodeAndVerifyJwtToken } from "./server/lib/auth";
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
