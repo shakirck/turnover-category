@@ -3,21 +3,36 @@ import Trpc from "./api/trpc/[trpc]";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import Link from "next/link";
+import { ZodError } from "zod";
+import {z} from 'zod'
 export default function Signup() {
-  const mymutation = api.auth.signup.useMutation();
+  const[errror , setError] = useState<string | null>(null)
+  const mymutation = api.auth.signup.useMutation({
+    onError: (error) => {
+      console.error(error);
+      setError(error.message);
+      if(error instanceof ZodError){
+      }
+    }
+  });
   const router = useRouter();
 
   const [state, setState] = useState({ email: "",  name: "" , password: "" });
   const submit = async () => {
+  try {
+    if( !state.email || !state.password || !state.name){
+      setError("Please provide email, name and password");
+      return;
+    }
     const res = await mymutation.mutateAsync(state);
-    // const token = res.token
-    // localStorage.setItem("token", token);
-    // console.log(token,'token')
     router.push({
       pathname: "/verify",
       query: { email: state.email },
     
     });
+  } catch (error) {
+    
+  }
   };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -27,7 +42,7 @@ export default function Signup() {
   };
   return (
 <div className="flex h-auto justify-center">
-      <div className="my-20 flex h-auto w-1/4 flex-col rounded-2xl border-2 p-10 [&>*]:p-5">
+      <div className="my-20 flex h-auto w-[576px] w-min[576px] flex-col rounded-2xl border-2 p-10 [&>*]:p-5">
         <div className="flex w-full flex-col items-center">
           <div className="my-5 text-3xl  font-semibold">Create your account</div>
         </div>
@@ -83,7 +98,9 @@ export default function Signup() {
               Create Account
             </button>
           </div>
-
+          {
+            errror && <div className="text-red-500 text-lg font-semibold">{errror}</div>
+          }
           <div className="w-full border-t-2"></div>
           <div className="w-full flex justify-center  items-center">
             <span >Have an account</span>

@@ -1,29 +1,44 @@
 import { useRouter } from "next/router";
 import Trpc from "./api/trpc/[trpc]";
 import { api } from "~/utils/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import React, { createRef } from "react";
 import { set } from "zod";
 
 const refs: any = Array(8)
-.fill(0)
-.map((_, i) => createRef());
+  .fill(0)
+  .map((_, i) => createRef());
 export default function Signup() {
-  const [code , setCode] = useState<Array<string>>([]);
-  const verifyMutation = api.auth.verify.useMutation();
+  const [code, setCode] = useState<Array<string>>([]);
+  const [error, setError] = useState<boolean>(false);
+  const verifyMutation = api.auth.verify.useMutation({
+    onError: (error) => {
+      setError(true);
+    },
+  });
   const router = useRouter();
-  console.log(code);
+  const email = router.query.email as string;
+  if (!email) {
+    router.push("/signup");
+  }
+ 
   const handleInputChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.value) {
         if (index < refs.length - 1) {
-          setCode([...code.slice(0, index), e.target.value, ...code.slice(index + 1)]);
+          setCode([
+            ...code.slice(0, index),
+            e.target.value,
+            ...code.slice(index + 1),
+          ]);
           refs[index + 1].current.focus();
         }
-        if(index === refs.length - 1){
+        if (index === refs.length - 1) {
           setCode([...code.slice(0, index), e.target.value]);
-      }
+        }
+
+        setError(false);
       }
     };
 
@@ -35,30 +50,57 @@ export default function Signup() {
       }
     };
 
-  const handleSubmit =  async () => {
-    console.log("clicked");
+  const handleSubmit = async () => {
+    try {
+      console.log("clicked");
 
-    if (code.length != 8) {
+      if (code.length != 8) {
+        console.error("Please provide a valid code");
+        return;
+      }
+      const codeString = code.join("");
+      const email = router.query.email as string;
+      if (!email) {
+        console.error("Please provide a valid email");
+        router.push("/signup");
+      }
+      console.log(codeString);
+      const verified = await verifyMutation.mutateAsync({
+        code: codeString,
+        email: email,
+      });
+      console.log(verified);
+      if (verified && verified.token) {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text");
+    if (pastedData.length !== 8) {
       console.error("Please provide a valid code");
       return;
     }
-    const codeString = code.join("");
-    const email = router.query.email as string;
-    if (!email) {
-      console.error("Please provide a valid email");
-      router.push("/signup");
-    }
-    console.log(codeString);
-   const verified = await  verifyMutation.mutateAsync({ code: codeString ,email:email });
-    console.log(verified);
-    if (verified  && verified.token) {
-      router.push("/dashboard");
-    }
+    setCode(pastedData.split(""));
+
+    // add the code into the input box
+    refs.forEach((ref: any, index: number) => {
+      ref.current.value = pastedData[index];
+    });
+  
   };
+  function obfuscateEmail(email: string) {
+    let [username, domain] = email.split("@");
+    let obfuscatedNamePart = username?.substring(0, 3) + "***";
+    return obfuscatedNamePart + "@" + domain;
+  }
 
   return (
     <div className="flex h-auto justify-center">
-      <div className="my-20 flex h-auto w-2/5 flex-col rounded-2xl border-2 p-2 [&>*]:p-5">
+      <div className="my-20 flex h-auto w-[576px] flex-col rounded-2xl border-2 p-2 [&>*]:p-5">
         <div className="flex w-full flex-col items-center">
           <div className="my-5 text-3xl  font-semibold">
             Verify Your Account
@@ -66,7 +108,7 @@ export default function Signup() {
           <div className="text-2xl  ">
             Enter the 8 digit code you have recieved on{" "}
           </div>
-          <div className="text-lg  ">sdfdfsdsdf@gmail.com</div>
+          <div className="text-lg  ">{obfuscateEmail(email)}</div>
         </div>
         <div className="flex w-full flex-col [&>*]:py-5">
           <div
@@ -85,7 +127,10 @@ export default function Signup() {
                     maxLength={1}
                     onChange={handleInputChange(index)}
                     onKeyDown={handleKeyDown(index)}
-                    className="w-1/12 rounded-md border-2 p-3"
+                    onPaste={onPaste}
+                    className={`w-1/12 rounded-md border-2 p-3 ${
+                      error ? "border-red-500" : "border-gray-400"
+                    }`}
                   />
                 ),
               )}
@@ -100,32 +145,21 @@ export default function Signup() {
             >
               VERIFY
             </button>
+            {error && (
+              <div className="text-red-500 text-lg font-semibold">
+                Please enter a valid code
+              </div>
+            )  
+            }
+
+            {
+              verifyMutation.isPending && <div>Verifying...</div>
+            }
           </div>
         </div>
       </div>
     </div>
 
-    // const handleInputChange = (index : any) => (e : any) => {
-    //   if (e.target.value) {
-    //     if (index < refs.length - 1) {
-    //       refs[index + 1].current.focus();
-    //     }
-    //   }
-    // };
-
-    // return (
-    //   <div>
-    //     {refs.map((ref:any, index:any) => (
-    //       <input
-    //         key={index}
-    //         type="text"
-    //         ref={ref}
-    //         maxLength={1}
-    //         onChange={handleInputChange(index)}
-    //         className="rounded-md border-2 p-3 w-1/12"
-    //       />
-    //     ))}
-    //   </div>
   );
-  // );
+  
 }

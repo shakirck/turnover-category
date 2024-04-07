@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createToken } from "~/server/lib/auth";
@@ -52,7 +52,7 @@ export const authRouter = createTRPCRouter({
   signup: publicProcedure
     .input(
       z.object({
-        email: z.string().min(4),
+        email: z.string().email(),
         password: z.string().min(8),
         name: z.string().min(4),
       }),
@@ -166,4 +166,20 @@ export const authRouter = createTRPCRouter({
         token: jwt,
       };
     }),
+    signout: publicProcedure.mutation(async ({ctx}) => {
+      ctx.res.setHeader(
+        "Set-Cookie",
+        cookie.serialize("token", "", {
+          httpOnly: true,
+          maxAge: -1,
+          path: "/",
+          sameSite: "lax",
+        })
+      );
+      return true;
+    },
+  ),
+  isAuthenticated: privateProcedure.query(async ({ctx}) => {
+    return ctx.user;
+  }),
 });

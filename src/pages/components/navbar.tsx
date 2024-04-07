@@ -1,10 +1,9 @@
-import { useContext } from "react";
 import { PiShoppingCartSimple } from "react-icons/pi";
 import { IoIosSearch } from "react-icons/io";
-
+import Link from "next/link";
 const Navbar = () => {
     return (
-        <div className="bg-slate-100 flex-col w-full p-2 ">
+        <div className="bg-[#FFFFFF] flex-col w-full p-2 ">
           <div className="top flex justify-end text-sm">
             <div className="p-2 px-10">Help</div>
             <div className="p-2">Orders and returns</div>
@@ -12,7 +11,9 @@ const Navbar = () => {
           </div>
           <div className="bottom flex justify-between ">
           <div className="logo font-bold text-xl"  >
-                ECOMMERCE
+               <Link href="/">
+               ECOMMERCE
+               </Link>
             </div>
             <div className="links flex justify-evenly list-none p-1 text-lg">
                 <li className="p-2 font-semibold ">Categories</li>

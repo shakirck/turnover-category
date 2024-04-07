@@ -13,14 +13,13 @@ export default function Dashboard() {
   });
   const mymutate = api.categories.markCategory.useMutation();
   const data = myquery.data;
-  console.log(data, "data type");
+
   const categories: any = data?.categories;
   const totalItems = data?.totalItems as number;
   const totalPages = Math.ceil(totalItems / 6);
-  console.log(categories);
   const [checkedStates, setCheckedStates] = useState<any>({});
   const checkedStatus: { [key: number]: boolean } = {};
-  console.log(checkedStatus);
+  
   useEffect(() => {
     if (categories) {
       categories.forEach((categories: any) => {
@@ -35,7 +34,6 @@ export default function Dashboard() {
     const checkedId = event.target.value;
     const checked = event.target.checked;
 
-    // Update checkedStates
     setCheckedStates((prevStates: any) => ({
       ...prevStates,
       [checkedId]: checked,
@@ -52,14 +50,15 @@ export default function Dashboard() {
   };
 
   const checkboxList = categories?.map((category: any, index: number) => {
+ 
     return (
-      <div className="inline-flex items-center" 
-      key={`${category.id}-${currentPage}-${index}-parent`}
-      
+      <div
+        className="min-h-[500px inline-flex items-center"
+        key={`${category.id}-${currentPage}-${index}-parent`}
       >
         <label
           key={`${category.id}-${currentPage}-${index}`}
-          className="relative flex cursor-pointer items-center rounded-full p-3"
+          className="relative flex cursor-pointer items-center rounded-full px-2 py-3"
           htmlFor={category.id.toString()}
         >
           <input
@@ -95,13 +94,12 @@ export default function Dashboard() {
     );
   });
   const pages = () => {
-    // return first  5 pages  , then current Page if it is not in first 5 pages and then .....
     if (currentPage <= 5) {
       return [...Array(5).keys()].map((i) => {
         return (
           <div
             className={`mx-2 cursor-pointer ${currentPage === i + 1 ? "text-black" : "text-gray-500"}`}
-            key={i +1}
+            key={i + 1}
             onClick={() => goToPage(i + 1)}
           >
             {i + 1}
@@ -130,35 +128,36 @@ export default function Dashboard() {
   };
   return (
     <div className="flex h-auto justify-center">
-      <div className="my-20 flex h-auto w-1/4 flex-col rounded-2xl border-2 p-10 [&>*]:p-5">
-        <div className="flex w-full flex-col items-center">
+      <div className="my-20 flex h-auto min-h-[650px] min-w-[576px] flex-col rounded-2xl border-2 pl-10">
+        <div className="flex w-full flex-col items-center  justify-around">
           <div className="my-5 text-3xl  font-semibold">
             Please mark your interests
           </div>
           <div className="text-1xl  ">We will keep you notified</div>
         </div>
-        <div className="text-2xl font-medium">My Saved interests!</div>
-        <div className="flex w-full flex-col justify-center [&>*]:py-5">
+        <div className="text-2xl font-medium ">My Saved interests!</div>
+        <div className="min-h-[556px] flex w-full flex-col justify-start [&>*]:py-3">
+          {myquery.isLoading && <div>Loading...</div>}
           {checkboxList}
         </div>
 
-        <div className="flex justify-center">
-          <div>
+        <div className="flex justify-center pb-5">
+          <div className="cursor-pointer w-10 p-3">
             <AiOutlineDoubleLeft onClick={() => goToPage(1)} />
           </div>
-          <div>
+          <div className="cursor-pointer w-10 p-3">
             <IoChevronBackOutline onClick={() => goToPage(currentPage - 1)} />
           </div>
-          <div className="flex">
+          <div className="flex p-3">
             {pages()}
             <div>....</div>
           </div>
-          <div>
+          <div className="cursor-pointer w-10 p-3">
             <IoChevronForwardOutline
               onClick={() => goToPage(currentPage + 1)}
             />
           </div>
-          <div>
+          <div className="cursor-pointer w-10 p-3">
             <AiOutlineDoubleRight onClick={() => goToPage(totalPages)} />
           </div>
         </div>

@@ -1,10 +1,27 @@
+
 import Head from "next/head";
 import Link from "next/link";
-
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
+ export default function Home() {
+  const hello = api.auth.signout.useMutation();
+  const isAuthed = api.auth.isAuthenticated.useQuery();
+  const [isLogged , setIsLogged] = useState(false)
 
-export default function Home() {
-  const hello = api.post.hello.useQuery({ text: "from tRPC" });
+  useEffect(() => {
+    if(isAuthed.data){
+      setIsLogged(true)
+    }
+  }
+  , [isAuthed.data])
+  const signout = async () => {
+    try {
+      await hello.mutateAsync();
+      setIsLogged(false)
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -14,9 +31,26 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center ">
-         <h1>
-          Hello
-         </h1>
+         <Link href="/signup" className="m-1">
+           <button className="bg-black text-white p-4 rounded-md w-20">
+           Signup
+           </button>
+        </Link>
+
+        <Link href="/signin">
+           <button className="bg-black text-white p-4 rounded-md w-20">
+           signin
+           </button>
+        </Link>
+
+        {isLogged && (
+          
+          <button className="bg-red-500 text-white p-4 rounded-md w-20 m-10" onClick={signout}>
+          Logout
+          </button>
+        )
+        }
+
       </main>
     </>
   );
