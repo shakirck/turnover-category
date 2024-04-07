@@ -1,28 +1,23 @@
-import { Resend } from "resend";
 import dayjs from "dayjs";
 import { db } from "~/server/db";
-import { createTransport } from "nodemailer";
-const transporter = createTransport({
-  host: process.env.EMAIL_HOST,
-  port: 587,
-  secure: false, // Use `true` for port 465, `false` for all other ports
-  auth: {
-    user: process.env.EMAIL_AUTH_USER,
-    pass: process.env.EMAIL_AUTH_PASSWORD,
-  },
-});
+import sgMail from '@sendgrid/mail'
+
 export const sendEmail = async (
   email: string,
   content: string,
   subject: string,
 ) => {
-  const info = await transporter.sendMail({
-    from: '"shakirck 👻" <shakirck333@gmail.com>', // sender address
-    to: email, // list of receivers
-    subject: subject, // Subject line
-    html: content, // html body
-  });
-  console.log("Message sent: %s", info);
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY ?? "")
+  const msg = {
+    to:  email, // Change to your recipient
+    from: "shakirckyt@gmail.com", // Change to your verified sender
+    subject:  subject,
+    html: content,
+  }
+  const status = await sgMail.send(msg)
+  
+  return 
 };
 export const sendVerificationEmail = async (email: string) => {
   console.log("  sendVerificationEmail to ", email);
