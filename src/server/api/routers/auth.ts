@@ -66,12 +66,14 @@ export const authRouter = createTRPCRouter({
         },
       });
       if (checkUserExists?.isVerified) {
+        console.error("User already exists");
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "User already exists",
         });
       }
       if (checkUserExists && !checkUserExists.isVerified) {
+        console.log(" not verified user exists")
         await  sendVerificationEmail(email);
         return {
           user: checkUserExists,
