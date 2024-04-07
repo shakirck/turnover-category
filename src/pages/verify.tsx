@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-'use client'
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import {  useState } from "react";
@@ -89,6 +88,9 @@ export default function Signup() {
     });
   };
   function obfuscateEmail(email: string) {
+    if (!email) {
+      return "";
+    }
     const [username, domain] = email.split("@");
     const obfuscatedNamePart = username?.substring(0, 3) + "***";
     return obfuscatedNamePart + "@" + domain;
