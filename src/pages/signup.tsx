@@ -13,7 +13,11 @@ export default function Signup() {
     // const token = res.token
     // localStorage.setItem("token", token);
     // console.log(token,'token')
-    router.push("/verify");
+    router.push({
+      pathname: "/verify",
+      query: { email: state.email },
+    
+    });
   };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,

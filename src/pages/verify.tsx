@@ -7,10 +7,12 @@ import React, { createRef } from "react";
 import { set } from "zod";
 
 const refs: any = Array(8)
-  .fill(0)
-  .map((_, i) => createRef());
+.fill(0)
+.map((_, i) => createRef());
 export default function Signup() {
   const [code , setCode] = useState<Array<string>>([]);
+  const verifyMutation = api.auth.verify.useMutation();
+  const router = useRouter();
   console.log(code);
   const handleInputChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,32 +23,42 @@ export default function Signup() {
         }
         if(index === refs.length - 1){
           setCode([...code.slice(0, index), e.target.value]);
-        }
+      }
       }
     };
 
   const handleKeyDown =
     (index: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Backspace" && !e.currentTarget.value && index > 0) {
-        // remove the index from code
         setCode([...code.slice(0, index), ...code.slice(index + 1)]);
         refs[index - 1].current.focus();
       }
     };
 
-  const handleSubmit = () => {
+  const handleSubmit =  async () => {
     console.log("clicked");
 
     if (code.length != 8) {
       console.error("Please provide a valid code");
       return;
     }
-    console.log(code);
+    const codeString = code.join("");
+    const email = router.query.email as string;
+    if (!email) {
+      console.error("Please provide a valid email");
+      router.push("/signup");
+    }
+    console.log(codeString);
+   const verified = await  verifyMutation.mutateAsync({ code: codeString ,email:email });
+    console.log(verified);
+    if (verified  && verified.token) {
+      router.push("/dashboard");
+    }
   };
 
   return (
     <div className="flex h-auto justify-center">
-      <div className="my-20 flex h-auto w-1/4 flex-col rounded-2xl border-2 p-2 [&>*]:p-5">
+      <div className="my-20 flex h-auto w-2/5 flex-col rounded-2xl border-2 p-2 [&>*]:p-5">
         <div className="flex w-full flex-col items-center">
           <div className="my-5 text-3xl  font-semibold">
             Verify Your Account

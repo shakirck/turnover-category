@@ -1,21 +1,30 @@
 import { Resend } from "resend";
 import dayjs from "dayjs";
 import { db } from "~/server/db";
-export const sendEmail = (email: string, content: string, subject: string) => {
-  const resend = new Resend(process.env.RESEND_EMAIL_CLIENT_API_KEY);
-
-  resend.emails.send({
-    from: "onboarding@resend.dev",
-    to: "shakirckyt@gmail.com",
-    subject: subject,
-    html: content,
+import {createTransport}  from  "nodemailer"
+const transporter = createTransport({
+  host: process.env.EMAIL_HOST,
+  port: 587,
+  secure: false, // Use `true` for port 465, `false` for all other ports
+  auth: {
+    user: process.env.EMAIL_AUTH_USER,
+    pass: process.env.EMAIL_AUTH_PASSWORD,
+  },
+});
+export const sendEmail =  async (email: string, content: string, subject: string) => {
+  const info = await transporter.sendMail({
+    from: '"shakirck 👻" <shakirck333@gmail.com>', // sender address
+    to: email, // list of receivers
+    subject: subject, // Subject line
+    html: content, // html body
   });
-  console.log("email sent");
+  console.log("Message sent: %s", info);
+
 };
 export const sendVerificationEmail = async (email: string) => {
   console.log("  sendVerificationEmail to ", email);
   const code = generateCode(8);
-  const expiryTime = dayjs().minute(10).toISOString();
+  const expiryTime = dayjs().add(10, "minute").toISOString();
   console.log(expiryTime);
 
   await db.verificationOTP.upsert({
@@ -41,10 +50,16 @@ export const sendVerificationEmail = async (email: string) => {
 };
 export const generateCode = (length: number) => {
   const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
+    if(i < 4){
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    else{
+      result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    }
   }
   return result;
 };

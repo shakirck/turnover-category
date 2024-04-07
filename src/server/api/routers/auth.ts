@@ -96,14 +96,16 @@ export const authRouter = createTRPCRouter({
         code: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input ,ctx}) => {
       const { email, code } = input;
+      console.log(email, code, "verify")
       const user = await db.user.findFirst({
         where: {
           email: email,
         },
       });
       if (!user) {
+        console.error("User not found");
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "User not found",
@@ -116,6 +118,7 @@ export const authRouter = createTRPCRouter({
         },
       });
       if (!verification) {
+        console.error("Invalid code");
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Invalid code",
@@ -123,7 +126,10 @@ export const authRouter = createTRPCRouter({
       }
 
       const currentTime = new Date().toISOString();
+      console.log(currentTime, verification.expiry, "time")
+      console.log(new Date(currentTime) , new Date(verification.expiry) , "time")
       if (new Date(currentTime) > new Date(verification.expiry)) {
+        console.error("Code expired");
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Code expired",
@@ -136,15 +142,25 @@ export const authRouter = createTRPCRouter({
         },
       });
 
+      console.log(user, "user")
       await db.user.update({
         where: {
           id: user.id,
         },
         data: {
-          isVerified: true,
+          isVerified: true
         },
       });
       const jwt = await createToken(user);
+      ctx.res.setHeader(
+        "Set-Cookie",
+        cookie.serialize("token", String(jwt), {
+          httpOnly: true,
+          maxAge: 60 * 60 * 24,
+          path: "/",
+          sameSite: "lax",
+        })
+      );
       return {
         user,
         token: jwt,

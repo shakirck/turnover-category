@@ -7,7 +7,7 @@ const alg = "HS256";
 
 export const createToken = async (payload: any) => {
   const jwt = await new jose.SignJWT({
-    username: payload.username,
+  user_id: payload.id,
   })
     .setProtectedHeader({ alg })
     .setIssuedAt()

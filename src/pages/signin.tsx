@@ -50,6 +50,7 @@ export default function Signin() {
                 id="email"
                 placeholder="email"
                 className="w-full rounded-md border-0 p-3 pr-10  outline-none"
+                onChange={(e) => handleChange(e, "email")}
               />
             </div>
           </div>
@@ -64,6 +65,7 @@ export default function Signin() {
                 id="password"
                 placeholder="password"
                 className="w-full rounded-md border-0 p-3 pr-10  outline-none"
+                onChange={(e) => handleChange(e, "password")}
               />
               <button
                 type="button"
@@ -75,7 +77,7 @@ export default function Signin() {
             </div>
           </div>
           <div className="flex flex-col">
-            <button className="rounded-md bg-black p-3 text-white hover:bg-slate-900">
+            <button className="rounded-md bg-black p-3 text-white hover:bg-slate-900" onClick={handleSubmit}>
               Login
             </button>
           </div>
